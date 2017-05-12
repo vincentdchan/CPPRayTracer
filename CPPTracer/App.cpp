@@ -148,6 +148,17 @@ LRESULT CALLBACK App::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 
 		result = 1;
 	}
+	else if (message >= WM_USER && message < 0x7FFF) 
+	{
+		App *pApp = reinterpret_cast<App *>(
+			::GetWindowLongPtrW(
+				hwnd,
+				GWLP_USERDATA
+			));
+
+		if (pApp)
+			result = pApp->OnUserMessage(hwnd, message, wParam, lParam);
+	}
 	else
 	{
 		App *pApp = reinterpret_cast<App *>(
@@ -196,6 +207,7 @@ LRESULT CALLBACK App::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 			result = 1;
 			wasHandled = true;
 			break;
+
 			}
 		}
 

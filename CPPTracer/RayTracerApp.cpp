@@ -44,20 +44,25 @@ char* RayTracerApp::renderDepth(
 	return pixels;
 }
 
+/// <summary>
+/// ¶þ¶Î¹¹Ôì
+/// </summary>
 HRESULT RayTracerApp::Initialize()
 {
 	HRESULT hr = App::Initialize();
 
-	using namespace Shape;
-	Sphere scene(Vector3f(0, 10, -10), 10);
-	PerspectiveCamera camera(
-		Vector3f(0, 10, 10),
-		Vector3f(0, 0, -1),
-		Vector3f(0, 1, 0),
-		90
-	);
-	_renderedPixels = renderDepth(400, 400, scene, camera, 20);
-	this->OnRender();
+	if (SUCCEEDED(hr)) {
+		uiThreadId = GetCurrentThreadId();
+		renderThreadHandle = CreateThread(
+			nullptr,
+			0,
+			RenderThreadFunc,
+			this,
+			0,
+			&renderThreadId
+		);
+	}
+
 	return hr;
 }
 
@@ -111,6 +116,30 @@ HRESULT RayTracerApp::OnRender()
 	}
 
 	return hr;
+}
+
+DWORD WINAPI RayTracerApp::RenderThreadFunc(LPVOID lpParam) {
+	RayTracerApp* This = reinterpret_cast<RayTracerApp*>(lpParam);
+	using namespace Shape;
+	Sphere scene(Vector3f(0, 10, -10), 10);
+	PerspectiveCamera camera(
+		Vector3f(0, 10, 10),
+		Vector3f(0, 0, -1),
+		Vector3f(0, 1, 0),
+		90
+	);
+	This->_renderedPixels = This->renderDepth(400, 400, scene, camera, 20);
+	// This->OnRender(); // Do not render on this thread,
+	// post message to ui thread and make it render
+	// MSG msg;
+	// bool result = PostThreadMessage(uiThreadId, msg, )
+	// bool result = PostThreadMessage(This->uiThreadId, WM_USER, 0, 0);
+	bool result =  PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);
+	return result ? 0 : 1;
+}
+
+HRESULT RayTracerApp::OnUserMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	return OnRender();
 }
 
 void RayTracerApp::DiscardDeviceResources()

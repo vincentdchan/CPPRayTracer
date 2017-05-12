@@ -75,6 +75,9 @@ protected:
 	// Draw content.
 	virtual HRESULT OnRender();
 
+	// Use defined message
+	virtual HRESULT OnUserMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) { return S_OK; }
+
 	// Resize the render target.
 	void OnResize(
 		UINT width,
