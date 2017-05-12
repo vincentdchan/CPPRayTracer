@@ -8,7 +8,8 @@ namespace Shape
 
 	class Intersectable
 	{
-		virtual IntersectResult intersect(const Ray&) = 0;
+	public:
+		virtual IntersectResult intersect(const Ray&) const = 0;
 	};
 
 }

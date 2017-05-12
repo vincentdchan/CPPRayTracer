@@ -51,7 +51,7 @@ HRESULT App::Initialize()
 		wcex.hbrBackground = NULL;
 		wcex.lpszMenuName = NULL;
 		wcex.hCursor = LoadCursor(NULL, IDI_APPLICATION);
-		wcex.lpszClassName = L"D2DDemoApp";
+		wcex.lpszClassName = L"RayTracerApp";
 
 		RegisterClassEx(&wcex);
 
@@ -67,8 +67,8 @@ HRESULT App::Initialize()
 
 		// Create the window.
 		m_hwnd = CreateWindow(
-			L"D2DDemoApp",
-			L"Direct2D Demo App",
+			L"RayTracerApp",
+			L"Ray Tracer Demo App",
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
@@ -143,18 +143,18 @@ LRESULT CALLBACK App::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 		::SetWindowLongPtrW(
 			hwnd,
 			GWLP_USERDATA,
-			PtrToUlong(pApp)
+			(LONG_PTR)pApp
 		);
 
 		result = 1;
 	}
 	else
 	{
-		App *pApp = reinterpret_cast<App *>(static_cast<LONG_PTR>(
+		App *pApp = reinterpret_cast<App *>(
 			::GetWindowLongPtrW(
 				hwnd,
 				GWLP_USERDATA
-			)));
+			));
 
 		bool wasHandled = false;
 
@@ -232,7 +232,7 @@ HRESULT App::OnRender()
 	if (hr == D2DERR_RECREATE_TARGET)
 	{
 		hr = S_OK;
-		DiscardDeviceResources();
+		this->DiscardDeviceResources();
 	}
 
 	return hr;

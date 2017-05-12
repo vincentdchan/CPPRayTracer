@@ -31,11 +31,11 @@ public:
 	PerspectiveCamera(const PerspectiveCamera&) = delete;
 	PerspectiveCamera& operator=(const PerspectiveCamera&) = delete;
 
-	Ray generate_ray(float x, float y)
+	Ray generate_ray(float x, float y) const
 	{
-		auto r = _right * ((x - 0.5) * _fovScale);
-		auto u = _up * ((y - 0.5) * _fovScale);
-		auto d = _front + r + u;
+		Vector3f r = _right * ((x - 0.5) * _fovScale);
+		Vector3f u = _up * ((y - 0.5) * _fovScale);
+		Vector3f d = _front + r + u;
 		d.normalize();
 		return Ray(_eye, d);
 	}

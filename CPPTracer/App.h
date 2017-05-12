@@ -57,7 +57,7 @@ public:
 	~App();
 
 	// Register the window class and call methods for instantiating drawing resources
-	HRESULT Initialize();
+	virtual HRESULT Initialize();
 
 	// Process and dispatch messages
 	void RunMessageLoop();
@@ -70,7 +70,7 @@ protected:
 	HRESULT CreateDeviceResources();
 
 	// Release device-dependent resource.
-	void DiscardDeviceResources();
+	virtual void DiscardDeviceResources();
 
 	// Draw content.
 	virtual HRESULT OnRender();

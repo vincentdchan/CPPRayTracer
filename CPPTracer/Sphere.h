@@ -24,7 +24,7 @@ namespace Shape
 			_center(that._center), _radius(that._radius), _sqrRadius(that._sqrRadius)
 		{}
 
-		virtual IntersectResult intersect(const Ray& ray)
+		virtual IntersectResult intersect(const Ray& ray) const
 		{
 			auto v = ray.get_origin() - _center;
 			float a0 = v.dot(v) - _sqrRadius;
@@ -39,7 +39,8 @@ namespace Shape
 					Vector3f position = ray.get_point(distance);
 					Vector3f normal = position - _center;
 					normal.normalize();
-					return IntersectResult(this, distance, position, normal);
+					IntersectResult tmp(this, distance, position, normal);
+					return tmp;
 				}
 			}
 			return IntersectResult();

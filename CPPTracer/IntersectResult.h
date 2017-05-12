@@ -11,7 +11,7 @@ namespace Shape
 	{
 
 	private:
-		Intersectable * _geometry;
+		const Intersectable * _geometry;
 		float _distance;
 		Vector3f _position;
 		Vector3f _normal;
@@ -23,7 +23,7 @@ namespace Shape
 		{
 		}
 
-		IntersectResult(Intersectable * geometry, float distance, const Vector3f& position, const Vector3f& normal):
+		IntersectResult(const Intersectable * geometry, float distance, const Vector3f& position, const Vector3f& normal):
 
 			_geometry(geometry),
 			_distance(distance),
@@ -40,7 +40,7 @@ namespace Shape
 
 		IntersectResult& operator=(const IntersectResult&) = delete;
 
-		inline Intersectable * get_geometry()
+		inline const Intersectable * get_geometry()
 		{
 			return _geometry;
 		}
