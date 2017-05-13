@@ -28,6 +28,10 @@ private:
 	DWORD uiThreadId;
 
 	char* renderDepth(int width, int height, const Shape::Intersectable&, const PerspectiveCamera&, int maxDepth);
+	void renderMaterial(char** ptr, int width, int height, 
+		const Shape::Intersectable&, 
+		const PerspectiveCamera&);
+
 	char* _renderedPixels;
 	ID2D1Bitmap * _renderedBitmap;
 

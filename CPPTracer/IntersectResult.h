@@ -1,5 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
+#include "IGeometry.h"
 #include "Intersectable.h"
 
 using namespace Eigen;
@@ -11,19 +12,21 @@ namespace Shape
 	{
 
 	private:
-		const Intersectable * _geometry;
+		const IGeometry * _geometry;
 		float _distance;
 		Vector3f _position;
 		Vector3f _normal;
 
 	public:
 
+		static const IntersectResult nullResult;
+
 		IntersectResult():
 			_geometry(nullptr), _distance(0)
 		{
 		}
 
-		IntersectResult(const Intersectable * geometry, float distance, const Vector3f& position, const Vector3f& normal):
+		IntersectResult(const IGeometry * geometry, float distance, const Vector3f& position, const Vector3f& normal):
 
 			_geometry(geometry),
 			_distance(distance),
@@ -40,24 +43,44 @@ namespace Shape
 
 		IntersectResult& operator=(const IntersectResult&) = delete;
 
-		inline const Intersectable * get_geometry()
+		inline const IGeometry * get_geometry() const
 		{
 			return _geometry;
 		}
 
-		inline float get_distance()
+		inline void set_geometry(const IGeometry * geo)
+		{
+			_geometry = geo;
+		}
+
+		inline float get_distance() const
 		{
 			return _distance;
 		}
 
-		inline const Vector3f& get_position()
+		inline void set_distance(float distance)
+		{
+			_distance = distance;
+		}
+
+		inline const Vector3f& get_position() const
 		{
 			return _position;
 		}
 
-		inline const Vector3f& get_normal()
+		inline void set_position(const Vector3f& vec)
+		{
+			_position = vec;
+		}
+
+		inline const Vector3f& get_normal() const
 		{
 			return _normal;
+		}
+
+		inline void set_normal(const Vector3f& nor)
+		{
+			_normal = nor;
 		}
 
 	};

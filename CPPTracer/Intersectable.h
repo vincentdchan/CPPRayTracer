@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "Ray.h"
 
 namespace Shape
@@ -9,7 +10,8 @@ namespace Shape
 	class Intersectable
 	{
 	public:
-		virtual IntersectResult intersect(const Ray&) const = 0;
+		virtual std::shared_ptr<IntersectResult> 
+			intersect(const Ray&) const = 0;
 	};
 
 }
