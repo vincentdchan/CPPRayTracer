@@ -3,8 +3,11 @@
 #include "App.h"
 #include "Intersectable.h"
 #include "PerspectiveCamera.h"
+#include "Ray.h"
+#include "Color.h"
 
 #include <d2d1.h>
+#include <ctime>
 
 #define MSG_REPAINT WM_USER
 
@@ -22,25 +25,38 @@ public:
 	{
 	}
 
+	static const int renderWidth = 1024;
+	static const int renderHeight = 1024;
+
 private:
 	HANDLE renderThreadHandle;
 	DWORD renderThreadId;
 	DWORD uiThreadId;
 
+	float timeDiff;
+
+	Color 
+		rayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect);
+
 	char* renderDepth(int width, int height, const Shape::Intersectable&, const PerspectiveCamera&, int maxDepth);
-	void renderMaterial(char** ptr, int width, int height, 
+	void renderMaterial(unsigned char** ptr, int width, int height, 
 		const Shape::Intersectable&, 
 		const PerspectiveCamera&);
+	void renderReflection(unsigned char** ptr, int width, int height, 
+		const Shape::Intersectable&, 
+		const PerspectiveCamera&, int maxReflet);
 
-	char* _renderedPixels;
+	void saveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight);
+
+	unsigned char* _renderedPixels;
 	ID2D1Bitmap * _renderedBitmap;
 
 	static DWORD WINAPI RenderThreadFunc(LPVOID lpParam);
 
 protected:
 
-	virtual HRESULT OnRender();
-	virtual void DiscardDeviceResources();
-	virtual HRESULT OnUserMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	virtual HRESULT OnRender() override;
+	virtual void DiscardDeviceResources() override;
+	virtual HRESULT OnUserMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
 
 };

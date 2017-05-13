@@ -24,7 +24,7 @@ namespace Material
 		inline const Color& get_diffuse() const { return _diffuse; }
 		inline const Color& get_specular() const { return _specular; }
 		inline float get_shiniess() const { return _shiniess; }
-		inline float get_reflectiveness() const { return _reflectiveness; }
+		virtual float get_reflectiveness() const { return _reflectiveness; }
 
 	};
 

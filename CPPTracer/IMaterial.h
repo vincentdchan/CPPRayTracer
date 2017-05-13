@@ -14,6 +14,7 @@ namespace Material
 	public:
 
 		virtual Color sample(const Ray&, const Vector3f& position, const Vector3f& normal) const = 0;
+		virtual float get_reflectiveness() const = 0;
 
 	};
 

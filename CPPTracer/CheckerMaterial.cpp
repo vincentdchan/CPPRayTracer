@@ -1,14 +1,14 @@
 #include <math.h>
-#include "CheckMaterial.h"
+#include "CheckerMaterial.h"
 
 namespace Material
 {
 
-	CheckMaterial::CheckMaterial(float scale, float reflectiveness):
+	CheckerMaterial::CheckerMaterial(float scale, float reflectiveness):
 		_scale(scale), _reflectiveness(reflectiveness)
 	{}
 		
-	Color CheckMaterial::sample(const Ray& ray, 
+	Color CheckerMaterial::sample(const Ray& ray, 
 		const Vector3f& position, 
 		const Vector3f& normal) const
 	{

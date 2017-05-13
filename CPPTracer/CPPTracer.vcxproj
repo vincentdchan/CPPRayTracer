@@ -125,12 +125,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
-    <ClInclude Include="CheckMaterial.h" />
+    <ClInclude Include="CheckerMaterial.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="IGeometry.h" />
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="Intersectable.h" />
     <ClInclude Include="IntersectResult.h" />
+    <ClInclude Include="lodepng.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="PhongMaterial.h" />
     <ClInclude Include="Plane.h" />
@@ -141,9 +142,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="CheckMaterial.cpp" />
+    <ClCompile Include="CheckerMaterial.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="IntersectResult.cpp" />
+    <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhongMaterial.cpp" />
     <ClCompile Include="RayTracerApp.cpp" />
