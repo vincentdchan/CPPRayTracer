@@ -64,10 +64,10 @@ public:
 
 protected:
 	// Initialize device-independent resources.
-	HRESULT CreateDeviceIndependentResources();
+	virtual HRESULT CreateDeviceIndependentResources();
 
 	// Initialize device-dependent resources.
-	HRESULT CreateDeviceResources();
+	virtual HRESULT CreateDeviceResources();
 
 	// Release device-dependent resource.
 	virtual void DiscardDeviceResources();

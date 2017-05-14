@@ -37,7 +37,7 @@ HRESULT App::Initialize()
 
 	// Initialize device-indpendent resources, such
 	// as the Direct2D factory.
-	hr = CreateDeviceIndependentResources();
+	hr = this->CreateDeviceIndependentResources();
 
 	if (SUCCEEDED(hr))
 	{
@@ -224,7 +224,7 @@ HRESULT App::OnRender()
 {
 	HRESULT hr = S_OK;
 
-	hr = CreateDeviceResources();
+	hr = this->CreateDeviceResources();
 
 	if (SUCCEEDED(hr))
 	{

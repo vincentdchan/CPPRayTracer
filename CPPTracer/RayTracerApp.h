@@ -32,8 +32,11 @@ private:
 	HANDLE renderThreadHandle;
 	DWORD renderThreadId;
 	DWORD uiThreadId;
-
 	float timeDiff;
+
+	ID2D1SolidColorBrush *m_pBlackBrush;
+	IDWriteFactory* m_pDWriteFactory;
+	IDWriteTextFormat* m_pTextFormat;
 
 	Color 
 		rayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect);
@@ -58,5 +61,7 @@ protected:
 	virtual HRESULT OnRender() override;
 	virtual void DiscardDeviceResources() override;
 	virtual HRESULT OnUserMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
+	virtual HRESULT CreateDeviceIndependentResources() override;
+	virtual HRESULT CreateDeviceResources() override;
 
 };

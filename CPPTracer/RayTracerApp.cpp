@@ -99,6 +99,7 @@ void RayTracerApp::renderReflection(unsigned char** ptr, int width, int height,
 	*ptr = pixels;
 
 	int i = 0;
+	int delta = std::max<int>(height / 60, 10);
 	for (int y = 0; y < height; ++y)
 	{
 		float sy = 1 - static_cast<float>(y) / height;
@@ -112,8 +113,10 @@ void RayTracerApp::renderReflection(unsigned char** ptr, int width, int height,
 			pixels[i++] = std::min<int>(color(0) * 255, 255);
 			pixels[i++] = 255;
 		}
-		PostMessage(m_hwnd, WM_USER + 1, 0, 0);
+		if (y % delta == 0)
+			PostMessage(m_hwnd, WM_USER + 1, 0, 0);
 	}
+	PostMessage(m_hwnd, WM_USER + 1, 0, 0);
 }
 
 /// <summary>
@@ -139,6 +142,24 @@ HRESULT RayTracerApp::Initialize()
 	return hr;
 }
 
+HRESULT RayTracerApp::CreateDeviceResources()
+{
+	HRESULT hr = App::CreateDeviceResources();
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pRenderTarget->CreateSolidColorBrush(
+			D2D1::ColorF(D2D1::ColorF::Black, 1.0f),
+			&m_pBlackBrush
+		);
+	}
+	return hr;
+}
+
+void floatToWChar(LPTSTR str, float f)
+{
+	wsprintf(str, L"%d", static_cast<int>(f * 1000));
+}
+
 HRESULT RayTracerApp::OnRender()
 {
 	HRESULT hr = S_OK;
@@ -149,10 +170,15 @@ HRESULT RayTracerApp::OnRender()
 	D2D1_BITMAP_PROPERTIES prop = D2D1::BitmapProperties();
 	prop.pixelFormat = pixelFormat;
 
-	hr = CreateDeviceResources();
+	hr = this->CreateDeviceResources();
 
 	if (SUCCEEDED(hr))
 	{
+		WCHAR sc_helloWorld[256] = { 0 };
+		floatToWChar(sc_helloWorld, timeDiff);
+		// Retrieve the size of the render target.
+		D2D1_SIZE_F renderTargetSize = m_pRenderTarget->GetSize();
+
 		m_pRenderTarget->BeginDraw();
 		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
@@ -187,6 +213,15 @@ HRESULT RayTracerApp::OnRender()
 				 m_pRenderTarget->DrawBitmap(_renderedBitmap, destF, 1, 
 					D2D1_BITMAP_INTERPOLATION_MODE::D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
 					D2D1::RectF(0, 0, renderWidth, renderHeight));
+
+				 m_pRenderTarget->DrawText(
+					 sc_helloWorld,
+					 ARRAYSIZE(sc_helloWorld) - 1,
+					 m_pTextFormat,
+					 D2D1::RectF(0, 0, renderTargetSize.width / 4, renderTargetSize.height / 4),
+					 m_pBlackBrush
+				 );
+
 				 SafeRelease(&_renderedBitmap);
 			}
 
@@ -258,20 +293,10 @@ DWORD WINAPI RayTracerApp::RenderThreadFunc(LPVOID lpParam) {
 	std::clock_t begin = std::clock();
 	This->renderReflection(&(This->_renderedPixels), renderWidth, renderHeight, _union, camera, 3);
 	std::clock_t end = std::clock();
-	float result_t = (float)(end - begin) / CLOCKS_PER_SEC;
-	std::cout << result_t << std::endl;
+	This->timeDiff = (float)(end - begin) / CLOCKS_PER_SEC;
+	PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);
 
-	// This->renderMaterial(&(This->_renderedPixels), 400, 400, _union, camera);
-	// This->OnRender(); // Do not render on this thread,
-	// post message to ui thread and make it render
-	// MSG msg;
-	// bool result = PostThreadMessage(uiThreadId, msg, )
-	// bool result = PostThreadMessage(This->uiThreadId, WM_USER, 0, 0);
-	bool result =  PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);
-
-	// save to file
-	This->saveToFile("file.png", This->_renderedPixels, renderWidth, renderHeight);
-	return result ? 0 : 1;
+	return 0;
 }
 
 void RayTracerApp::saveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight) 
@@ -295,14 +320,55 @@ HRESULT RayTracerApp::OnUserMessage(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	return OnRender();
 }
 
+HRESULT RayTracerApp::CreateDeviceIndependentResources() {
+	HRESULT hr = App::CreateDeviceIndependentResources();
+
+	static const WCHAR msc_fontName[] = L"Verdana";
+	static const FLOAT msc_fontSize = 50;
+	if (SUCCEEDED(hr)) {
+		// Create a DirectWrite factory.
+		hr = DWriteCreateFactory(
+			DWRITE_FACTORY_TYPE_SHARED,
+			__uuidof(m_pDWriteFactory),
+			reinterpret_cast<IUnknown **>(&m_pDWriteFactory)
+		);
+	}
+	if (SUCCEEDED(hr)) {
+		hr = m_pDWriteFactory->CreateTextFormat(
+			msc_fontName,
+			NULL,
+			DWRITE_FONT_WEIGHT_NORMAL,
+			DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			msc_fontSize,
+			L"", //locale
+			&m_pTextFormat
+		);
+	}
+	if (SUCCEEDED(hr))
+	{
+		// Center the text horizontally and vertically.
+		m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+
+		m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+	}
+
+	return hr;
+}
+
 void RayTracerApp::DiscardDeviceResources()
 {
 	App::DiscardDeviceResources();
 	SafeRelease(&_renderedBitmap);
+	SafeRelease(&m_pBlackBrush);
 }
 
 RayTracerApp::~RayTracerApp()
 {
 	SafeRelease(&_renderedBitmap);
+	SafeRelease(&m_pDWriteFactory);
+	SafeRelease(&m_pTextFormat);
+	SafeRelease(&m_pBlackBrush);
 	delete[] _renderedPixels;
 }
