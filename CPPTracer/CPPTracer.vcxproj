@@ -59,13 +59,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='QuickDebug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -179,31 +179,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="App.h" />
     <ClInclude Include="CheckerMaterial.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="IGeometry.h" />
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="Intersectable.h" />
     <ClInclude Include="IntersectResult.h" />
-    <ClInclude Include="lodepng.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="PhongMaterial.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Ray.h" />
-    <ClInclude Include="RayTracerApp.h" />
     <ClInclude Include="SceneUnion.h" />
     <ClInclude Include="Sphere.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="App.cpp" />
     <ClCompile Include="CheckerMaterial.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="IntersectResult.cpp" />
-    <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="PhongMaterial.cpp" />
-    <ClCompile Include="RayTracerApp.cpp" />
     <ClCompile Include="SceneUnion.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
