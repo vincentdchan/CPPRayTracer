@@ -1,9 +1,9 @@
-#include <Eigen/Dense>
 #include <algorithm>
 #include <ctime>
 #include <iostream>
 #include <vector>
 
+#include "RayTracer.h"
 #include "RayTracerApp.h"
 #include "IntersectResult.h"
 
@@ -15,109 +15,6 @@
 #include "PerspectiveCamera.h"
 
 #include "lodepng.h"
-
-using namespace Eigen;
-
-char* RayTracerApp::renderDepth(
-	int width, int height, 
-	const Shape::Intersectable& scene, const PerspectiveCamera& camera, int maxDepth)
-{
-	char* pixels = new char[width * height * 4];
-
-	int i = 0;
-	for (int y = 0; y < height; ++y)
-	{
-		float sy = 1 - static_cast<float>(y) / height;
-		for (int x = 0; x < width; ++x)
-		{
-			float sx = static_cast<float>(x) / width;
-			auto ray = camera.generate_ray(sx, sy);
-			auto result = scene.intersect(ray);
-			if (result->get_geometry() != nullptr)
-			{
-				char depth = 255 - static_cast<char>(min((result->get_distance() / maxDepth) * 255, 255));
-				pixels[i++] = static_cast<char>((result->get_normal()(2) + 1) * 128);
-				pixels[i++] = static_cast<char>((result->get_normal()(1) + 1) * 128);
-				pixels[i++] = static_cast<char>((result->get_normal()(0) + 1) * 128);
-				pixels[i++] = static_cast<char>(255);
-			}
-			else
-			{
-				pixels[i++] = 0;
-				pixels[i++] = 0;
-				pixels[i++] = 0;
-				pixels[i++] = static_cast<char>(255);
-			}
-		}
-	}
-
-	return pixels;
-}
-
-void RayTracerApp::renderMaterial(unsigned char** ptr, int width, int height,
-	const Shape::Intersectable& scene,
-	const PerspectiveCamera& camera)
-{
-	unsigned char* pixels = new unsigned char[width * height * 4];
-	*ptr = pixels;
-
-	int i = 0;
-	for (int y = 0; y < height; ++y)
-	{
-		float sy = 1 - static_cast<float>(y) / height;
-		for (int x = 0; x < width; ++x)
-		{
-			float sx = static_cast<float>(x) / width;
-			auto ray = camera.generate_ray(sx, sy);
-			auto result = scene.intersect(ray);
-			if (result->get_geometry() != nullptr)
-			{
-				auto color = result->get_geometry()->get_material()->sample(ray, result->get_position(), result->get_normal());
-
-				pixels[i++] = std::min<int>(color(2) * 255, 255);
-				pixels[i++] = std::min<int>(color(1) * 255, 255);
-				pixels[i++] = std::min<int>(color(0) * 255, 255);
-				pixels[i++] = 255;
-			}
-			else
-			{
-				pixels[i++] = 0;
-				pixels[i++] = 0;
-				pixels[i++] = 0;
-				pixels[i++] = static_cast<char>(255);
-			}
-		}
-	}
-}
-
-void RayTracerApp::renderReflection(unsigned char** ptr, int width, int height,
-	const Shape::Intersectable& scene,
-	const PerspectiveCamera& camera,
-	int maxReflect)
-{
-	unsigned char* pixels = new unsigned char[width * height * 4];
-	*ptr = pixels;
-
-	int i = 0;
-	int delta = std::max<int>(height / 60, 10);
-	for (int y = 0; y < height; ++y)
-	{
-		float sy = 1 - static_cast<float>(y) / height;
-		for (int x = 0; x < width; ++x)
-		{
-			float sx = static_cast<float>(x) / width;
-			auto ray = camera.generate_ray(sx, sy);
-			auto color = rayTraceRecursive(scene, ray, maxReflect);
-			pixels[i++] = std::min<int>(color(2) * 255, 255);
-			pixels[i++] = std::min<int>(color(1) * 255, 255);
-			pixels[i++] = std::min<int>(color(0) * 255, 255);
-			pixels[i++] = 255;
-		}
-		if (y % delta == 0)
-			PostMessage(m_hwnd, WM_USER + 1, 0, 0);
-	}
-	PostMessage(m_hwnd, WM_USER + 1, 0, 0);
-}
 
 /// <summary>
 /// ¶þ¶Î¹¹Ôì
@@ -241,32 +138,6 @@ HRESULT RayTracerApp::OnRender()
 	return hr;
 }
 
-Color 
-RayTracerApp::rayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect)
-{
-	auto result = scene.intersect(ray);
-
-	if (result->get_geometry())
-	{
-		auto reflectiveness = result->get_geometry()->get_material()->get_reflectiveness();
-		Color color = result->get_geometry()->get_material()->sample(ray, 
-			result->get_position(), result->get_normal());
-		color = color * (1.0f - reflectiveness);
-
-		if (reflectiveness > 0 && maxReflect > 0)
-		{
-			Vector3f r = (result->get_normal() * (-2 * result->get_normal().dot(ray.get_direction()))) + 
-				ray.get_direction();
-			Ray new_ray(result->get_position(), r);
-			Color reflectedColor = rayTraceRecursive(scene, new_ray, maxReflect - 1);
-			color = color + (reflectedColor * reflectiveness);
-		}
-		return color;
-	}
-	else
-		return Color::black;
-}
-
 DWORD WINAPI RayTracerApp::RenderThreadFunc(LPVOID lpParam) {
 	RayTracerApp* This = reinterpret_cast<RayTracerApp*>(lpParam);
 	using namespace Shape;
@@ -290,8 +161,17 @@ DWORD WINAPI RayTracerApp::RenderThreadFunc(LPVOID lpParam) {
 		Vector3f(0, 1, 0),
 		90
 	);
+	int delta = renderHeight / 60;
 	std::clock_t begin = std::clock();
-	This->renderReflection(&(This->_renderedPixels), renderWidth, renderHeight, _union, camera, 3);
+	RayTracer::renderReflection(&(This->_renderedPixels), 
+		renderWidth, renderHeight, 
+		_union, camera, 3, 
+		[&This, delta](int y){
+
+		if (y % delta == 0) 
+			PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);
+
+	});
 	std::clock_t end = std::clock();
 	This->timeDiff = (float)(end - begin) / CLOCKS_PER_SEC;
 	PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);

@@ -38,17 +38,6 @@ private:
 	IDWriteFactory* m_pDWriteFactory;
 	IDWriteTextFormat* m_pTextFormat;
 
-	Color 
-		rayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect);
-
-	char* renderDepth(int width, int height, const Shape::Intersectable&, const PerspectiveCamera&, int maxDepth);
-	void renderMaterial(unsigned char** ptr, int width, int height, 
-		const Shape::Intersectable&, 
-		const PerspectiveCamera&);
-	void renderReflection(unsigned char** ptr, int width, int height, 
-		const Shape::Intersectable&, 
-		const PerspectiveCamera&, int maxReflet);
-
 	void saveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight);
 
 	unsigned char* _renderedPixels;
