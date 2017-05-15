@@ -10,7 +10,6 @@ class SceneUnion :
 	public std::vector<Intersectable*>, public Intersectable
 {
 
-	virtual std::shared_ptr<IntersectResult> 
-		intersect(const Ray&) const;
+	virtual bool intersect(const Ray&, IntersectResult&) const override;
 
 };

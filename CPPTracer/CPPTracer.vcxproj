@@ -53,7 +53,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -143,6 +143,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <AdditionalDependencies>d2d1.lib;Dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -181,10 +183,13 @@
   <ItemGroup>
     <ClInclude Include="CheckerMaterial.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="IGeometry.h" />
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="Intersectable.h" />
     <ClInclude Include="IntersectResult.h" />
+    <ClInclude Include="ILight.h" />
+    <ClInclude Include="LightSample.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="PhongMaterial.h" />
     <ClInclude Include="Plane.h" />
@@ -196,7 +201,9 @@
   <ItemGroup>
     <ClCompile Include="CheckerMaterial.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="IntersectResult.cpp" />
+    <ClCompile Include="LightSample.cpp" />
     <ClCompile Include="PhongMaterial.cpp" />
     <ClCompile Include="RayTracer.cpp" />
     <ClCompile Include="SceneUnion.cpp" />

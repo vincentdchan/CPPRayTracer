@@ -41,7 +41,13 @@ namespace Shape
 			_normal(that._normal)
 		{}
 
-		IntersectResult& operator=(const IntersectResult&) = delete;
+		IntersectResult& operator=(const IntersectResult& that)
+		{
+			_geometry = that._geometry;
+			_distance = that._distance;
+			_position = that._position;
+			_normal = that._normal;
+		}
 
 		inline const IGeometry * get_geometry() const
 		{

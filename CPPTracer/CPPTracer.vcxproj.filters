@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Shape">
       <UniqueIdentifier>{b27939f6-0d6d-40fb-9320-677d097e7d88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lights">
+      <UniqueIdentifier>{c5bb468b-6eee-490e-9852-c94bb5c27235}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Light">
+      <UniqueIdentifier>{77b39269-c114-41c0-adb6-26d376ecf796}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sphere.h">
@@ -66,6 +72,15 @@
     <ClInclude Include="RayTracer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ILight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="LightSample.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp">
@@ -85,6 +100,12 @@
     </ClCompile>
     <ClCompile Include="RayTracer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="LightSample.cpp">
+      <Filter>Source Files\Light</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

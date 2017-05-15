@@ -1,19 +1,19 @@
 #include <limits>
 #include "SceneUnion.h"
 
-std::shared_ptr<IntersectResult> 
-SceneUnion::intersect(const Ray& ray) const
+bool SceneUnion::intersect(const Ray& ray, IntersectResult& result) const
 {
+	bool allresult = false;
 	float minDistance = std::numeric_limits<float>::max();
-	auto minResult = std::make_shared<IntersectResult>(IntersectResult::nullResult);
+
 	for (auto i = begin(); i != end(); ++i)
 	{
-		auto result = (*i)->intersect(ray);
-		if (result->get_geometry() && result->get_distance() < minDistance)
+		auto bResult = (*i)->intersect(ray, result);
+		if (bResult && result.get_distance() < minDistance)
 		{
-			minDistance = result->get_distance();
-			minResult = result;
+			allresult = true;
+			minDistance = result.get_distance();
 		}
 	}
-	return minResult;
+	return allresult;
 }

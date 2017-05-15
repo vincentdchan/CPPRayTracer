@@ -10,8 +10,9 @@ namespace Shape
 	class Intersectable
 	{
 	public:
-		virtual std::shared_ptr<IntersectResult> 
-			intersect(const Ray&) const = 0;
+
+		virtual bool intersect(const Ray&, IntersectResult& result) const = 0;
+
 	};
 
 }

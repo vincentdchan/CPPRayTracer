@@ -30,8 +30,8 @@ namespace Shape
 			_material(that._material)
 		{}
 
-		virtual std::shared_ptr<IntersectResult> 
-			intersect(const Ray& ray) const
+		virtual bool
+			intersect(const Ray& ray, IntersectResult & result) const override
 		{
 			auto v = ray.get_origin() - _center;
 			float a0 = v.dot(v) - _sqrRadius;
@@ -46,11 +46,14 @@ namespace Shape
 					Vector3f position = ray.get_point(distance);
 					Vector3f normal = position - _center;
 					normal.normalize();
-					return std::make_shared<IntersectResult>(
-						this, distance, position, normal);
+					result.set_geometry(this);
+					result.set_distance(distance);
+					result.set_position(position);
+					result.set_normal(normal);
+					return true;
 				}
 			}
-			return std::make_shared<IntersectResult>(IntersectResult::nullResult);
+			return false;
 		}
 
 		void set_material(IMaterial * material) {

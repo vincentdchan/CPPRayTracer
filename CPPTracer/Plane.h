@@ -26,20 +26,19 @@ namespace Shape
 
 		virtual IMaterial* get_material() const { return _material; }
 
-		virtual std::shared_ptr<IntersectResult> 
-			intersect(const Ray& ray) const
+		virtual bool
+			intersect(const Ray& ray, IntersectResult& result) const override
 		{
 			float a = ray.get_direction().dot(_normal);
 			if (a >= 0)
-				return std::make_shared<IntersectResult>(IntersectResult::nullResult);
+				return false;
 
 			float b = _normal.dot(ray.get_origin() - _position);
-			auto result = std::make_shared<IntersectResult>();
-			result->set_geometry(this);
-			result->set_distance(-b / a);
-			result->set_position(ray.get_point(result->get_distance()));
-			result->set_normal(_normal);
-			return result;
+			result.set_geometry(this);
+			result.set_distance(-b / a);
+			result.set_position(ray.get_point(result.get_distance()));
+			result.set_normal(_normal);
+			return true;
 		}
 
 		inline const Vector3f get_normal() const { return _normal; }
