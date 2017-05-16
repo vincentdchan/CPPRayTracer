@@ -3,6 +3,9 @@
 #include "PerspectiveCamera.h"
 #include "Color.h"
 #include <functional>
+#include <Eigen/Dense>
+
+using namespace Eigen;
 
 class RayTracer
 {

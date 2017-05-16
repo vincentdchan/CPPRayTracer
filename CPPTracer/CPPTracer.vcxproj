@@ -181,6 +181,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Bound.h" />
     <ClInclude Include="CheckerMaterial.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="DirectionalLight.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Sphere.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bound.cpp" />
     <ClCompile Include="CheckerMaterial.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
