@@ -5,6 +5,7 @@
 #include "PerspectiveCamera.h"
 #include "Ray.h"
 #include "Color.h"
+#include "Tile.h"
 
 #include <d2d1.h>
 #include <ctime>
@@ -21,7 +22,7 @@ public:
 	virtual ~RayTracerApp();
 
 	RayTracerApp() : 
-		App(), _renderedBitmap(nullptr), _renderedPixels(nullptr)
+		App(), _renderedBitmap(nullptr)
 	{
 	}
 
@@ -40,7 +41,7 @@ private:
 
 	void saveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight);
 
-	unsigned char* _renderedPixels;
+	std::shared_ptr<Tile> _renderedTile;
 	ID2D1Bitmap * _renderedBitmap;
 
 	static DWORD WINAPI RenderThreadFunc(LPVOID lpParam);

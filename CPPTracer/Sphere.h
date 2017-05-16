@@ -64,6 +64,9 @@ namespace Shape
 			return _material;
 		}
 
+		virtual ~Sphere()
+		{}
+
 	};
 
 }

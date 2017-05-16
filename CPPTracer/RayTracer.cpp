@@ -2,6 +2,27 @@
 #include "IntersectResult.h"
 #include <algorithm>
 
+void RayTracer::run()
+{
+	_tile = std::make_shared<Tile>(_width, _height);
+
+	int i = 0;
+	int delta = std::max<int>(_height / 60, 10);
+	for (int y = 0; y < _height; ++y)
+	{
+		float sy = 1 - static_cast<float>(y) / _height;
+		for (int x = 0; x < _width; ++x)
+		{
+			float sx = static_cast<float>(x) / _width;
+			auto ray = _camera->generate_ray(sx, sy);
+			auto color = rayTraceRecursive(*_scene, ray, _maxReflect);
+			_tile->push_color(color);
+		}
+		_updateFunc(y);
+	}
+	_updateFunc(_height);
+}
+
 void RayTracer::renderDepth(unsigned char** ptr, int width, int height,
 	const Shape::Intersectable& scene,
 	const PerspectiveCamera& camera, int maxDepth, UpdateFunction func)

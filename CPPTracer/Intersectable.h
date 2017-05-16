@@ -12,6 +12,8 @@ namespace Shape
 	public:
 
 		virtual bool intersect(const Ray&, IntersectResult& result) const = 0;
+		virtual ~Intersectable() 
+		{}
 
 	};
 

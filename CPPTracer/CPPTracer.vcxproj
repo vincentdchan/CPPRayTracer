@@ -198,6 +198,7 @@
     <ClInclude Include="RayTracer.h" />
     <ClInclude Include="SceneUnion.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bound.cpp" />
@@ -209,6 +210,7 @@
     <ClCompile Include="PhongMaterial.cpp" />
     <ClCompile Include="RayTracer.cpp" />
     <ClCompile Include="SceneUnion.cpp" />
+    <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

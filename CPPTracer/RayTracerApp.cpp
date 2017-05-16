@@ -2,6 +2,7 @@
 #include <ctime>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "RayTracer.h"
 #include "RayTracerApp.h"
@@ -85,9 +86,10 @@ HRESULT RayTracerApp::OnRender()
 		int width = static_cast<int>(rtSize.width);
 		int height = static_cast<int>(rtSize.height);
 
-		if (_renderedPixels != nullptr)
+		if (_renderedTile)
 		{
-			hr = m_pRenderTarget->CreateBitmap(D2D1::SizeU(renderWidth, renderHeight), _renderedPixels, renderWidth * 4, &prop, &_renderedBitmap);
+			hr = m_pRenderTarget->CreateBitmap(D2D1::SizeU(renderWidth, renderHeight), 
+				_renderedTile->get_data(), renderWidth * 4, &prop, &_renderedBitmap);
 			// hr = m_pRenderTarget->CreateBitmap(D2D1::SizeU(400, 400), prop, &_renderedBitmap);
 
 			if (SUCCEEDED(hr))
@@ -141,38 +143,48 @@ HRESULT RayTracerApp::OnRender()
 DWORD WINAPI RayTracerApp::RenderThreadFunc(LPVOID lpParam) {
 	RayTracerApp* This = reinterpret_cast<RayTracerApp*>(lpParam);
 	using namespace Shape;
-	Plane plane(Vector3f(0, 1, 0), 0);
-	Sphere sphere1(Vector3f(-10, 10, -10), 10);
-	Sphere sphere2(Vector3f(10, 10, -10), 10);
+
+	auto plane = std::make_unique<Plane>(Vector3f(0, 1, 0), 0);
+	auto sphere1 = std::make_unique<Sphere>(Vector3f(-10, 10, -10), 10);
+	auto sphere2 = std::make_unique<Sphere>(Vector3f(10, 10, -10), 10);
 	PhongMaterial phong1(Color(0.85f, 0.1f, 0.1f), Color::white, 16, 0.25);
 	PhongMaterial phong2(Color(0.1f, 0.25f, 0.75f), Color::white, 16, 0.25);
 	CheckerMaterial check(0.1, 0.5);
-	plane.set_material(&check);
-	sphere1.set_material(&phong1);
-	sphere2.set_material(&phong2);
+	plane->set_material(&check);
+	sphere1->set_material(&phong1);
+	sphere2->set_material(&phong2);
 
-	SceneUnion _union;
-	_union.push_back(&plane);
-	_union.push_back(&sphere1);
-	_union.push_back(&sphere2);
-	PerspectiveCamera camera(
+	auto scene = std::make_shared<SceneUnion>();
+	scene->push_back(std::move(plane));
+	scene->push_back(std::move(sphere1));
+	scene->push_back(std::move(sphere2));
+	auto camera = std::make_shared<PerspectiveCamera>(
 		Vector3f(0, 5, 15),
 		Vector3f(0, 0, -1),
 		Vector3f(0, 1, 0),
 		90
 	);
 	int delta = renderHeight / 60;
-	std::clock_t begin = std::clock();
-	RayTracer::renderReflection(&(This->_renderedPixels), 
-		renderWidth, renderHeight, 
-		_union, camera, 3, 
-		[&This, delta](int y){
 
-		if (y % delta == 0) 
+	RayTracer rayTracer;
+	rayTracer.set_height(renderHeight);
+	rayTracer.set_width(renderWidth);
+	rayTracer.set_camera(camera);
+	rayTracer.set_scene(scene);
+	rayTracer.set_update_callback([&This, &rayTracer, delta](int y){
+
+		if (y % delta == 0) {
+			if (!This->_renderedTile)
+				This->_renderedTile = rayTracer.get_tile();
 			PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);
+		}
 
 	});
+
+	std::clock_t begin = std::clock();
+	rayTracer.run();
 	std::clock_t end = std::clock();
+
 	This->timeDiff = (float)(end - begin) / CLOCKS_PER_SEC;
 	PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);
 
@@ -250,5 +262,4 @@ RayTracerApp::~RayTracerApp()
 	SafeRelease(&m_pDWriteFactory);
 	SafeRelease(&m_pTextFormat);
 	SafeRelease(&m_pBlackBrush);
-	delete[] _renderedPixels;
 }

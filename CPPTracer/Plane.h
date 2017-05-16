@@ -46,6 +46,9 @@ namespace Shape
 
 		inline void set_material(IMaterial * material) { _material = material; }
 
+		virtual ~Plane()
+		{}
+
 	};
 
 }
