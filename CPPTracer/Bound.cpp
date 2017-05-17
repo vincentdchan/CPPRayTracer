@@ -16,7 +16,7 @@ Bound::begin() const
 Bound::iterator
 Bound::end() const
 {
-	return iterator(this, _left_top(0), _right_bottom(1) + 1);
+	return iterator(this, _left_top(0), _right_bottom(1));
 }
 
 Bound::iterator::iterator(const Bound * father):
@@ -66,7 +66,7 @@ Bound::iterator::operator*() const
 Bound::iterator&
 Bound::iterator::operator++()
 {
-	if (x <= _father->_right_bottom(0))
+	if (x < _father->_right_bottom(0))
 		x++;
 	else
 	{

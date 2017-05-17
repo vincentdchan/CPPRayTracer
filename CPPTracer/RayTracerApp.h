@@ -1,6 +1,8 @@
 #pragma once
 #include <Windows.h>
+#include <boost/thread/thread.hpp>
 #include "App.h"
+#include "RayTracer.h"
 #include "Intersectable.h"
 #include "PerspectiveCamera.h"
 #include "Ray.h"
@@ -30,9 +32,7 @@ public:
 	static const int renderHeight = 1024;
 
 private:
-	HANDLE renderThreadHandle;
-	DWORD renderThreadId;
-	DWORD uiThreadId;
+	boost::mutex update_mtx_;
 	float timeDiff;
 
 	ID2D1SolidColorBrush *m_pBlackBrush;
@@ -42,9 +42,10 @@ private:
 	void saveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight);
 
 	std::shared_ptr<Tile> _renderedTile;
+	std::shared_ptr<RayTracer> _rayTracer;
 	ID2D1Bitmap * _renderedBitmap;
 
-	static DWORD WINAPI RenderThreadFunc(LPVOID lpParam);
+	void render_thread();
 
 protected:
 

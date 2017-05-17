@@ -1,3 +1,4 @@
+#include <cstring>
 #include "Tile.h"
 
 Tile::Tile():
@@ -17,6 +18,27 @@ Tile::Tile(Tile&& that):
 	len(that.len), ptr(that.ptr), data(that.data)
 {
 	that.data = nullptr;
+}
+
+int Tile::get_offset(int x, int y) const
+{
+	return (y * width + x) * 4;
+}
+
+int Tile::get_offset(const Vector2i& point) const
+{
+	return get_offset(point(0), point(1));
+}
+
+void Tile::merge(const Bound& bound, const Tile& tile)
+{
+	for (Vector2i point : bound)
+	{
+		auto relative = point - bound.get_left_top();
+		unsigned char * this_ptr = data + get_offset(point);
+		unsigned char * target_ptr = tile.data + tile.get_offset(relative);
+		memcpy(this_ptr, target_ptr, sizeof(char) * 4);
+	}
 }
 
 Tile& Tile::operator=(Tile&& that)

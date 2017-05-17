@@ -56,9 +56,9 @@ private:
 
 	iterator(const Bound * fater);
 	iterator(const Bound * fater, int x, int y);
-	iterator(const iterator&);
 
 public:
+	iterator(const iterator&);
 	bool operator <(const iterator&) const;
 	bool operator >(const iterator&) const;
 	bool operator !=(const iterator&) const;

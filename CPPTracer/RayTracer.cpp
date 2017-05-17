@@ -23,6 +23,96 @@ void RayTracer::run()
 	_updateFunc(_height);
 }
 
+void RayTracer::parallel_run()
+{
+	_tile = std::make_shared<Tile>(_width, _height);
+
+	_queue = get_tile_bounds_queue();
+
+	std::vector<boost::thread> threads;
+	for (int i = 0; i < threadCount; ++i)
+	{
+		threads.push_back(boost::thread(boost::bind(&RayTracer::render_thread_async, this)));
+	}
+
+	for (auto i = threads.begin(); i != threads.end(); ++i)
+	{
+		i->join();
+	}
+
+}
+
+#undef min
+std::unique_ptr<std::queue<Bound>>
+RayTracer::get_tile_bounds_queue() const
+{
+	auto result = std::make_unique<std::queue<Bound>>();
+	for (int y = 0; y < _height; y += tileHeight)
+	{
+		for (int x = 0; x < _width; x += tileWidth)
+		{
+			Vector2i leftTop(x, y);
+			Vector2i rightBottom(
+				std::min(x + tileWidth, _width), 
+				std::min(y + tileHeight, _height)
+			);
+			result->push(Bound(leftTop, rightBottom));
+		}
+	}
+	return result;
+}
+
+void RayTracer::renderTile(const Bound& bound, Tile& tile)
+{
+	int i = 0;
+	int width = bound.get_width();
+	int height = bound.get_height();
+	int delta = std::max<int>(height / 60, 10);
+	for (int y = 0; y < height; ++y)
+	{
+		float sy = 1 - static_cast<float>(y + bound.get_left_top()(1)) / _height;
+		for (int x = 0; x < width; ++x)
+		{
+			float sx = static_cast<float>(x + bound.get_left_top()(0)) / _width;
+			auto ray = _camera->generate_ray(sx, sy);
+			auto color = rayTraceRecursive(*_scene, ray, _maxReflect);
+			tile.push_color(color);
+		}
+	}
+}
+
+void RayTracer::render_thread_async()
+{
+	while (render_tile_from_queue());
+}
+
+bool RayTracer::render_tile_from_queue()
+{
+	using namespace Util;
+
+	Bound bound;
+
+	queue_mtx_.lock();
+	if (_queue->empty())
+	{
+		queue_mtx_.unlock();
+		return false;
+	}
+	bound = _queue->front();
+	_queue->pop();
+	queue_mtx_.unlock();
+
+	Tile tile(bound.get_width(), bound.get_height());
+	renderTile(bound, tile);
+
+	merge_mtx_.lock();
+	_tile->merge(bound, tile);
+	_updateFunc(_height);
+	merge_mtx_.unlock();
+
+	return true;
+}
+
 void RayTracer::renderDepth(unsigned char** ptr, int width, int height,
 	const Shape::Intersectable& scene,
 	const PerspectiveCamera& camera, int maxDepth, UpdateFunction func)

@@ -26,15 +26,8 @@ HRESULT RayTracerApp::Initialize()
 
 	timeDiff = 0;
 	if (SUCCEEDED(hr)) {
-		uiThreadId = GetCurrentThreadId();
-		renderThreadHandle = CreateThread(
-			nullptr,
-			0,
-			RenderThreadFunc,
-			this,
-			0,
-			&renderThreadId
-		);
+		boost::thread t(boost::bind(&RayTracerApp::render_thread, this));
+		t.detach();
 	}
 
 	return hr;
@@ -140,8 +133,7 @@ HRESULT RayTracerApp::OnRender()
 	return hr;
 }
 
-DWORD WINAPI RayTracerApp::RenderThreadFunc(LPVOID lpParam) {
-	RayTracerApp* This = reinterpret_cast<RayTracerApp*>(lpParam);
+void RayTracerApp::render_thread() {
 	using namespace Shape;
 
 	auto plane = std::make_unique<Plane>(Vector3f(0, 1, 0), 0);
@@ -166,29 +158,34 @@ DWORD WINAPI RayTracerApp::RenderThreadFunc(LPVOID lpParam) {
 	);
 	int delta = renderHeight / 60;
 
-	RayTracer rayTracer;
-	rayTracer.set_height(renderHeight);
-	rayTracer.set_width(renderWidth);
-	rayTracer.set_camera(camera);
-	rayTracer.set_scene(scene);
-	rayTracer.set_update_callback([&This, &rayTracer, delta](int y){
+	std::clock_t last_update_clock = std::clock();
+	_rayTracer = std::make_shared<RayTracer>();
+	_rayTracer->set_height(renderHeight);
+	_rayTracer->set_width(renderWidth);
+	_rayTracer->set_camera(camera);
+	_rayTracer->set_scene(scene);
+	_rayTracer->set_update_callback([this, delta, &last_update_clock](int y){
 
-		if (y % delta == 0) {
-			if (!This->_renderedTile)
-				This->_renderedTile = rayTracer.get_tile();
-			PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);
+		this->update_mtx_.lock();
+		std::clock_t current = std::clock();
+		int diff = current - last_update_clock;
+		if (diff > 40)
+		{
+			if (!this->_renderedTile)
+				this->_renderedTile = this->_rayTracer->get_tile();
+			PostMessage(this->m_hwnd, WM_USER + 1, 0, 0);
+			last_update_clock = current;
 		}
+		this->update_mtx_.unlock();
 
 	});
 
 	std::clock_t begin = std::clock();
-	rayTracer.run();
+	_rayTracer->parallel_run();
 	std::clock_t end = std::clock();
 
-	This->timeDiff = (float)(end - begin) / CLOCKS_PER_SEC;
-	PostMessage(This->m_hwnd, WM_USER + 1, 0, 0);
-
-	return 0;
+	timeDiff = (float)(end - begin) / CLOCKS_PER_SEC;
+	PostMessage(m_hwnd, WM_USER + 1, 0, 0);
 }
 
 void RayTracerApp::saveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight) 
