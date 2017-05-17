@@ -66,9 +66,7 @@ Bound::iterator::operator*() const
 Bound::iterator&
 Bound::iterator::operator++()
 {
-	if (x < _father->_right_bottom(0))
-		x++;
-	else
+	if (++x >= _father->_right_bottom(0))
 	{
 		x = _father->_left_top(0);
 		++y;

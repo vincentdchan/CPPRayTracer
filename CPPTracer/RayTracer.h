@@ -22,7 +22,7 @@ public:
 	typedef std::function<void (int)> UpdateFunction;
 	static const int tileWidth = 16;
 	static const int tileHeight = 16;
-	static const int threadCount = 8;
+	static const int threadCount = 4;
 
 private:
 	unsigned char* _data;

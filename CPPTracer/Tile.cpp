@@ -34,7 +34,7 @@ void Tile::merge(const Bound& bound, const Tile& tile)
 {
 	for (Vector2i point : bound)
 	{
-		auto relative = point - bound.get_left_top();
+		Vector2i relative = point - bound.get_left_top();
 		unsigned char * this_ptr = data + get_offset(point);
 		unsigned char * target_ptr = tile.data + tile.get_offset(relative);
 		memcpy(this_ptr, target_ptr, sizeof(char) * 4);

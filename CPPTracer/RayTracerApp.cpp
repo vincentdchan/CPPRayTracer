@@ -159,6 +159,7 @@ void RayTracerApp::render_thread() {
 	int delta = renderHeight / 60;
 
 	std::clock_t last_update_clock = std::clock();
+
 	_rayTracer = std::make_shared<RayTracer>();
 	_rayTracer->set_height(renderHeight);
 	_rayTracer->set_width(renderWidth);

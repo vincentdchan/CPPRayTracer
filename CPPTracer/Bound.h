@@ -31,8 +31,7 @@ public:
 
 	inline int get_pixels_size() const
 	{
-		return (_right_bottom(0) - _left_top(0) + 1) * 
-			(_right_bottom(1) - _left_top(1) + 1);
+		return get_width() * get_height();
 	}
 
 	inline int get_width() const

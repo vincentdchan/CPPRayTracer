@@ -74,8 +74,8 @@ void Tile::push_pixel(char b, char g, char r, char alpha)
 
 void Tile::push_color(const Color& color)
 {
-	data[ptr++] = std::min<int>(color(2) * 255, 255);
-	data[ptr++] = std::min<int>(color(1) * 255, 255);
-	data[ptr++] = std::min<int>(color(0) * 255, 255);
-	data[ptr++] = 255;
+	data[ptr++] = static_cast<char>(std::min<int>(color(2) * 255, 255));
+	data[ptr++] = static_cast<char>(std::min<int>(color(1) * 255, 255));
+	data[ptr++] = static_cast<char>(std::min<int>(color(0) * 255, 255));
+	data[ptr++] = static_cast<char>(255);
 }
