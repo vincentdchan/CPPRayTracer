@@ -17,6 +17,7 @@
 
 #include "ILight.h"
 #include "DirectionalLight.h"
+#include "PointLight.h"
 #include "LightRayTracer.h"
 
 #include "lodepng.h"
@@ -153,8 +154,12 @@ void RayTracerApp::RenderThread() {
 	// scene->push_back(std::move(sphere));
 
 	auto lightArr = std::make_shared<std::vector<std::unique_ptr<Light::ILight>>>();
-	lightArr->push_back(std::make_unique<Light::DirectionalLight>(
-		Color(1, 0.5, 1), Vector3f(-1.75, -2, -1.5)));
+	// lightArr->push_back(std::make_unique<Light::DirectionalLight>(
+	// 	Color(1, 0.5, 1), Vector3f(-1.75, -2, -1.5)));
+	lightArr->push_back(std::make_unique<Light::PointLight>(
+		Color(0.5, 0.5, 1) * 2000, Vector3f(30, 40, 20)));
+	lightArr->push_back(std::make_unique<Light::PointLight>(
+		Color(0.5, 1, 0.5) * 2000, Vector3f(-30, 40, 20)));
 	/*
 	auto camera = std::make_shared<PerspectiveCamera>(
 		Vector3f(0, 10, 10), 

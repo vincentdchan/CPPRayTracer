@@ -195,6 +195,7 @@
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="PhongMaterial.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RayTracer.h" />
     <ClInclude Include="SceneUnion.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="LightRayTracer.cpp" />
     <ClCompile Include="LightSample.cpp" />
     <ClCompile Include="PhongMaterial.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RayTracer.cpp" />
     <ClCompile Include="SceneUnion.cpp" />
     <ClCompile Include="Tile.cpp" />
