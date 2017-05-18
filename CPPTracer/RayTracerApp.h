@@ -39,7 +39,6 @@ private:
 	IDWriteFactory* m_pDWriteFactory;
 	IDWriteTextFormat* m_pTextFormat;
 
-
 	std::shared_ptr<Tile> _renderedTile;
 	std::shared_ptr<RayTracer> _rayTracer;
 	ID2D1Bitmap * _renderedBitmap;

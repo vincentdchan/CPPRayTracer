@@ -5,8 +5,11 @@
 namespace Light
 {
 
-	std::shared_ptr<LightSample> 
-		DirectionalLight::sample(const Intersectable* scene, const Vector3f& position) const
+	bool
+		DirectionalLight::sample(
+			const Intersectable* scene, 
+			const Vector3f& position,
+			LightSample& lightSample) const
 	{
 
 		IntersectResult shadowResult;
@@ -14,10 +17,12 @@ namespace Light
 		{
 			Ray shadowRay(position, _real_direction);
 			if (scene->intersect(shadowRay, shadowResult))
-				return std::make_shared<LightSample>(LightSample::zero);
+				return false;
 		}
 
-		return std::make_shared<LightSample>(_real_direction, _irradiance);
+		lightSample.set_direction(_real_direction);
+		lightSample.set_irradiance(_irradiance);
+		return true;
 	}
 
 }

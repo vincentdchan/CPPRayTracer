@@ -22,9 +22,10 @@ public:
 		const Vector3f& front,
 		const Vector3f& up,
 		float fov):
-		_eye(eye), _front(front), _up(up), _fov(fov)
+		_eye(eye), _front(front), _fov(fov)
 	{
 		_right = front.cross(up);
+		_up = _right.cross(front);
 		_fovScale = tanf(fov * 0.5f * PI / 180) * 2;
 	}
 

@@ -16,8 +16,9 @@ namespace Light
 	{
 	public:
 
-		virtual std::shared_ptr<LightSample> 
-		sample(const Intersectable* scene, const Vector3f& position) const = 0;
+		virtual bool sample(const Intersectable* scene, 
+			const Vector3f& position, 
+			LightSample& lightSample) const = 0;
 
 	};
 

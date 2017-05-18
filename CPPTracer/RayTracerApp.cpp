@@ -15,6 +15,10 @@
 #include "CheckerMaterial.h"
 #include "PerspectiveCamera.h"
 
+#include "ILight.h"
+#include "DirectionalLight.h"
+#include "LightRayTracer.h"
+
 #include "lodepng.h"
 
 /// <summary>
@@ -136,6 +140,29 @@ HRESULT RayTracerApp::OnRender()
 void RayTracerApp::RenderThread() {
 	using namespace Shape;
 
+	/*
+	auto plane1 = std::make_unique<Plane>(Vector3f(0, 1, 0), 0);
+	auto plane2 = std::make_unique<Plane>(Vector3f(0, 0, 1), -50);
+	auto plane3 = std::make_unique<Plane>(Vector3f(1, 0, 0), -20);
+	auto sphere = std::make_unique<Sphere>(Vector3f(0, 10, -10), 10);
+	auto scene = std::make_shared<SceneUnion>();
+	scene->push_back(std::move(plane1));
+	scene->push_back(std::move(plane2));
+	scene->push_back(std::move(plane3));
+	*/
+	// scene->push_back(std::move(sphere));
+
+	auto lightArr = std::make_shared<std::vector<std::unique_ptr<Light::ILight>>>();
+	lightArr->push_back(std::make_unique<Light::DirectionalLight>(
+		Color(1, 0.5, 1), Vector3f(-1.75, -2, -1.5)));
+	/*
+	auto camera = std::make_shared<PerspectiveCamera>(
+		Vector3f(0, 10, 10), 
+		Vector3f(0, 0, -1), 
+		Vector3f(0, 0, 1), 
+		90);
+		*/
+
 	auto plane = std::make_unique<Plane>(Vector3f(0, 1, 0), 0);
 	auto sphere1 = std::make_unique<Sphere>(Vector3f(-10, 10, -10), 10);
 	auto sphere2 = std::make_unique<Sphere>(Vector3f(10, 10, -10), 10);
@@ -156,16 +183,19 @@ void RayTracerApp::RenderThread() {
 		Vector3f(0, 1, 0),
 		90
 	);
-	int delta = renderHeight / 60;
 
 	std::clock_t last_update_clock = std::clock();
 
-	_rayTracer = std::make_shared<RayTracer>();
+	auto lightRt = std::make_shared<LightRayTracer>();
+	lightRt->SetLightCollection(lightArr);
+
+	_rayTracer = std::make_shared<LightRayTracer>();
+	(reinterpret_cast<LightRayTracer*>(_rayTracer.get()))->SetLightCollection(lightArr);
 	_rayTracer->set_height(renderHeight);
 	_rayTracer->set_width(renderWidth);
 	_rayTracer->set_camera(camera);
 	_rayTracer->set_scene(scene);
-	_rayTracer->set_update_callback([this, delta, &last_update_clock](int y){
+	_rayTracer->set_update_callback([this, &last_update_clock](int y){
 
 		this->update_mtx_.lock();
 		std::clock_t current = std::clock();

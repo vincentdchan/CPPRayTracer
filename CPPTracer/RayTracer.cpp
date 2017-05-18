@@ -74,11 +74,15 @@ void RayTracer::RenderTile(const Bound& bound, Tile& tile)
 		for (int x = 0; x < width; ++x)
 		{
 			float sx = static_cast<float>(x + bound.get_left_top()(0)) / _width;
-			auto ray = _camera->generate_ray(sx, sy);
-			auto color = RayTraceRecursive(*_scene, ray, _maxReflect);
-			tile.push_color(color);
+			tile.push_color(RenderPixel(sx, sy));
 		}
 	}
+}
+
+Color RayTracer::RenderPixel(float sx, float sy) const
+{
+	auto ray = _camera->generate_ray(sx, sy);
+	return RayTraceRecursive(*_scene, ray, _maxReflect);
 }
 
 void RayTracer::render_thread_async()
@@ -114,7 +118,8 @@ bool RayTracer::render_tile_from_queue()
 }
 
 Color 
-RayTracer::RayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect)
+RayTracer::RayTraceRecursive(const Shape::Intersectable& scene, 
+	const Ray& ray, int maxReflect) const
 {
 	Shape::IntersectResult result;
 	if (scene.intersect(ray, result))

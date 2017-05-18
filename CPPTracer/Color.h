@@ -48,6 +48,12 @@ public:
 			(*this)(2) + f);
 	}
 
+	inline Color& operator+=(const Color& color)
+	{
+		Vector3f::operator+=(color);
+		return *this;
+	}
+
 	inline Color operator*(float f) const
 	{
 		return Color((*this)(0) * f, 

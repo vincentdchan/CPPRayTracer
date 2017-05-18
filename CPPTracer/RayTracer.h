@@ -24,7 +24,7 @@ public:
 	static const int tileHeight = 16;
 	static const int threadCount = 4;
 
-private:
+protected:
 	int _width;
 	int _height;
 	int _maxReflect;
@@ -34,6 +34,7 @@ private:
 	std::unique_ptr<std::queue<Bound>> _queue;
 	UpdateFunction _updateFunc;
 
+private:
 	boost::mutex queue_mtx_;
 	boost::mutex merge_mtx_;
 
@@ -49,6 +50,7 @@ public:
 	void Run();
 	void ParallelRun();
 	void RenderTile(const Bound&, Tile&);
+	virtual Color RenderPixel(float sx, float sy) const;
 	std::unique_ptr<std::queue<Bound>> 
 		GetTileBoundsQueue() const;
 
@@ -79,6 +81,6 @@ public:
 	{ }
 
 protected:
-	Color RayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect);
+	Color RayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect) const;
 
 };

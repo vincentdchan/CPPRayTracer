@@ -13,7 +13,7 @@ namespace Light
 	{
 	private:
 		Color _irradiance;
-		Vector3f _direction;
+		// Vector3f _direction;
 		Vector3f _real_direction;
 		bool _shadow;
 
@@ -23,19 +23,21 @@ namespace Light
 		{}
 
 		DirectionalLight(const Color& irradiance, const Vector3f& direction):
-			_irradiance(irradiance), _direction(direction), _shadow(true)
+			_irradiance(irradiance), /*_direction(direction),*/ _shadow(true)
 		{
-			_real_direction = _direction;
+			_real_direction = direction;
 			_real_direction.normalize();
 			_real_direction *= -1;
 		}
 
-		virtual std::shared_ptr<LightSample> 
-		sample(const Intersectable* scene, const Vector3f& position) const override;
+		bool
+		sample(const Intersectable* scene, 
+			const Vector3f& position,
+			LightSample& lightSample) const override;
 
 		inline const Color& get_irradiance() const { return _irradiance; }
 
-		inline const Vector3f& get_direction() const { return _direction; }
+		// inline const Vector3f& get_direction() const { return _direction; }
 
 		inline bool get_shadow() const { return _shadow; }
 
