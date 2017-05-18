@@ -26,7 +26,7 @@ HRESULT RayTracerApp::Initialize()
 
 	timeDiff = 0;
 	if (SUCCEEDED(hr)) {
-		boost::thread t(boost::bind(&RayTracerApp::render_thread, this));
+		boost::thread t(boost::bind(&RayTracerApp::RenderThread, this));
 		t.detach();
 	}
 
@@ -133,7 +133,7 @@ HRESULT RayTracerApp::OnRender()
 	return hr;
 }
 
-void RayTracerApp::render_thread() {
+void RayTracerApp::RenderThread() {
 	using namespace Shape;
 
 	auto plane = std::make_unique<Plane>(Vector3f(0, 1, 0), 0);
@@ -182,14 +182,14 @@ void RayTracerApp::render_thread() {
 	});
 
 	std::clock_t begin = std::clock();
-	_rayTracer->parallel_run();
+	_rayTracer->ParallelRun();
 	std::clock_t end = std::clock();
 
 	timeDiff = (float)(end - begin) / CLOCKS_PER_SEC;
 	PostMessage(m_hwnd, WM_USER + 1, 0, 0);
 }
 
-void RayTracerApp::saveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight) 
+void RayTracerApp::SaveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight) 
 { 
 	int maxLen = srcWidth * srcHeight * 4;
 

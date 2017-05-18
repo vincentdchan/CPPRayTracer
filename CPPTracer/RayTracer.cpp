@@ -2,7 +2,7 @@
 #include "IntersectResult.h"
 #include <algorithm>
 
-void RayTracer::run()
+void RayTracer::Run()
 {
 	_tile = std::make_shared<Tile>(_width, _height);
 
@@ -15,7 +15,7 @@ void RayTracer::run()
 		{
 			float sx = static_cast<float>(x) / _width;
 			auto ray = _camera->generate_ray(sx, sy);
-			auto color = rayTraceRecursive(*_scene, ray, _maxReflect);
+			auto color = RayTraceRecursive(*_scene, ray, _maxReflect);
 			_tile->push_color(color);
 		}
 		_updateFunc(y);
@@ -23,11 +23,11 @@ void RayTracer::run()
 	_updateFunc(_height);
 }
 
-void RayTracer::parallel_run()
+void RayTracer::ParallelRun()
 {
 	_tile = std::make_shared<Tile>(_width, _height);
 
-	_queue = get_tile_bounds_queue();
+	_queue = GetTileBoundsQueue();
 
 	std::vector<boost::thread> threads;
 	for (int i = 0; i < threadCount; ++i)
@@ -44,7 +44,7 @@ void RayTracer::parallel_run()
 
 #undef min
 std::unique_ptr<std::queue<Bound>>
-RayTracer::get_tile_bounds_queue() const
+RayTracer::GetTileBoundsQueue() const
 {
 	auto result = std::make_unique<std::queue<Bound>>();
 	for (int y = 0; y < _height; y += tileHeight)
@@ -62,7 +62,7 @@ RayTracer::get_tile_bounds_queue() const
 	return result;
 }
 
-void RayTracer::renderTile(const Bound& bound, Tile& tile)
+void RayTracer::RenderTile(const Bound& bound, Tile& tile)
 {
 	int i = 0;
 	int width = bound.get_width();
@@ -75,7 +75,7 @@ void RayTracer::renderTile(const Bound& bound, Tile& tile)
 		{
 			float sx = static_cast<float>(x + bound.get_left_top()(0)) / _width;
 			auto ray = _camera->generate_ray(sx, sy);
-			auto color = rayTraceRecursive(*_scene, ray, _maxReflect);
+			auto color = RayTraceRecursive(*_scene, ray, _maxReflect);
 			tile.push_color(color);
 		}
 	}
@@ -103,7 +103,7 @@ bool RayTracer::render_tile_from_queue()
 	queue_mtx_.unlock();
 
 	Tile tile(bound.get_width(), bound.get_height());
-	renderTile(bound, tile);
+	RenderTile(bound, tile);
 
 	merge_mtx_.lock();
 	_tile->merge(bound, tile);
@@ -113,81 +113,8 @@ bool RayTracer::render_tile_from_queue()
 	return true;
 }
 
-void RayTracer::renderDepth(unsigned char** ptr, int width, int height,
-	const Shape::Intersectable& scene,
-	const PerspectiveCamera& camera, int maxDepth, UpdateFunction func)
-{
-	*ptr = new unsigned char[width * height * 4];
-	unsigned char *pixels = *ptr;
-
-	int i = 0;
-	Shape::IntersectResult result;
-	for (int y = 0; y < height; ++y)
-	{
-		float sy = 1 - static_cast<float>(y) / height;
-		for (int x = 0; x < width; ++x)
-		{
-			float sx = static_cast<float>(x) / width;
-			auto ray = camera.generate_ray(sx, sy);
-			if (scene.intersect(ray, result))
-			{
-				char depth = 255 - std::min<int>((result.get_distance() / maxDepth) * 255, 255);
-				pixels[i++] = (result.get_normal()(2) + 1) * 128;
-				pixels[i++] = (result.get_normal()(1) + 1) * 128;
-				pixels[i++] = (result.get_normal()(0) + 1) * 128;
-				pixels[i++] = 255;
-			}
-			else
-			{
-				pixels[i++] = 0;
-				pixels[i++] = 0;
-				pixels[i++] = 0;
-				pixels[i++] = static_cast<char>(255);
-			}
-		}
-		func(y);
-	}
-}
-
-void RayTracer::renderMaterial(unsigned char** ptr, int width, int height,
-	const Shape::Intersectable& scene,
-	const PerspectiveCamera& camera, UpdateFunction func)
-{
-	unsigned char* pixels = new unsigned char[width * height * 4];
-	*ptr = pixels;
-
-	int i = 0;
-	Shape::IntersectResult result;
-	for (int y = 0; y < height; ++y)
-	{
-		float sy = 1 - static_cast<float>(y) / height;
-		for (int x = 0; x < width; ++x)
-		{
-			float sx = static_cast<float>(x) / width;
-			auto ray = camera.generate_ray(sx, sy);
-			if (scene.intersect(ray, result))
-			{
-				auto color = result.get_geometry()->get_material()->sample(ray, result.get_position(), result.get_normal());
-
-				pixels[i++] = std::min<int>(color(2) * 255, 255);
-				pixels[i++] = std::min<int>(color(1) * 255, 255);
-				pixels[i++] = std::min<int>(color(0) * 255, 255);
-				pixels[i++] = 255;
-			}
-			else
-			{
-				pixels[i++] = 0;
-				pixels[i++] = 0;
-				pixels[i++] = 0;
-				pixels[i++] = static_cast<char>(255);
-			}
-		}
-		func(y);
-	}
-}
-
 Color 
-RayTracer::rayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect)
+RayTracer::RayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect)
 {
 	Shape::IntersectResult result;
 	if (scene.intersect(ray, result))
@@ -202,39 +129,11 @@ RayTracer::rayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, 
 			Vector3f r = (result.get_normal() * (-2 * result.get_normal().dot(ray.get_direction()))) + 
 				ray.get_direction();
 			Ray new_ray(result.get_position(), r);
-			Color reflectedColor = rayTraceRecursive(scene, new_ray, maxReflect - 1);
+			Color reflectedColor = RayTraceRecursive(scene, new_ray, maxReflect - 1);
 			color = color + (reflectedColor * reflectiveness);
 		}
 		return color;
 	}
 	else
 		return Color::black;
-}
-
-void RayTracer::renderReflection(unsigned char** ptr, int width, int height,
-	const Shape::Intersectable& scene,
-	const PerspectiveCamera& camera,
-	int maxReflect,
-	UpdateFunction func)
-{
-	unsigned char* pixels = new unsigned char[width * height * 4];
-	*ptr = pixels;
-
-	int i = 0;
-	int delta = std::max<int>(height / 60, 10);
-	for (int y = 0; y < height; ++y)
-	{
-		float sy = 1 - static_cast<float>(y) / height;
-		for (int x = 0; x < width; ++x)
-		{
-			float sx = static_cast<float>(x) / width;
-			auto ray = camera.generate_ray(sx, sy);
-			auto color = rayTraceRecursive(scene, ray, maxReflect);
-			pixels[i++] = std::min<int>(color(2) * 255, 255);
-			pixels[i++] = std::min<int>(color(1) * 255, 255);
-			pixels[i++] = std::min<int>(color(0) * 255, 255);
-			pixels[i++] = 255;
-		}
-		func(y);
-	}
 }

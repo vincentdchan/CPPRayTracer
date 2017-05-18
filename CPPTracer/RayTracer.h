@@ -25,7 +25,6 @@ public:
 	static const int threadCount = 4;
 
 private:
-	unsigned char* _data;
 	int _width;
 	int _height;
 	int _maxReflect;
@@ -44,17 +43,14 @@ private:
 public:
 
 	RayTracer():
-		_data(nullptr), _maxReflect(3)
+		_maxReflect(3)
 	{}
 
-	void run();
-	void parallel_run();
-	void renderTile(const Bound&, Tile&);
+	void Run();
+	void ParallelRun();
+	void RenderTile(const Bound&, Tile&);
 	std::unique_ptr<std::queue<Bound>> 
-		get_tile_bounds_queue() const;
-
-	inline const unsigned char * 
-		get_date() const { return _data; }
+		GetTileBoundsQueue() const;
 
 	inline int get_width() const { return _width; }
 
@@ -80,26 +76,9 @@ public:
 	inline void set_update_callback(UpdateFunction func) { _updateFunc = func; }
 
 	~RayTracer()
-	{
-		if (_data != nullptr)
-			delete[] _data;
-	}
+	{ }
 
-	static void renderDepth(unsigned char** ptr, int width, int height, 
-		const Shape::Intersectable&, 
-		const PerspectiveCamera&, int maxDepth, UpdateFunction func);
-
-	static void renderMaterial(unsigned char** ptr, int width, int height, 
-		const Shape::Intersectable&, 
-		const PerspectiveCamera&, UpdateFunction func);
-
-	static Color 
-		rayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect);
-
-	static void renderReflection(unsigned char** ptr, int width, int height, 
-		const Shape::Intersectable&, 
-		const PerspectiveCamera&, 
-		int maxReflect,
-		UpdateFunction func);
+protected:
+	Color RayTraceRecursive(const Shape::Intersectable& scene, const Ray& ray, int maxReflect);
 
 };

@@ -39,13 +39,13 @@ private:
 	IDWriteFactory* m_pDWriteFactory;
 	IDWriteTextFormat* m_pTextFormat;
 
-	void saveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight);
 
 	std::shared_ptr<Tile> _renderedTile;
 	std::shared_ptr<RayTracer> _rayTracer;
 	ID2D1Bitmap * _renderedBitmap;
 
-	void render_thread();
+	void SaveToFile(const char* filename, unsigned char *pixels, int srcWidth, int srcHeight);
+	void RenderThread();
 
 protected:
 
