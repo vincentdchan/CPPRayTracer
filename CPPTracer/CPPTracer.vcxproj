@@ -200,6 +200,7 @@
     <ClInclude Include="RayTracer.h" />
     <ClInclude Include="SceneUnion.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Tile.h" />
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +215,7 @@
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RayTracer.cpp" />
     <ClCompile Include="SceneUnion.cpp" />
+    <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

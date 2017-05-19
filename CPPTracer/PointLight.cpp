@@ -21,6 +21,7 @@ namespace Light
 		_intensity = pt._intensity;
 		_position = pt._position;
 		_shadow = pt._shadow;
+		return *this;
 	}
 
 	bool PointLight::sample(const Intersectable* scene,
