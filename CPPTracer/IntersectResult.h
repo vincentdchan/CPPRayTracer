@@ -47,6 +47,7 @@ namespace Shape
 			_distance = that._distance;
 			_position = that._position;
 			_normal = that._normal;
+			return *this;
 		}
 
 		inline const IGeometry * get_geometry() const

@@ -155,16 +155,18 @@ void RayTracerApp::RenderThread() {
 	// scene->push_back(std::move(sphere));
 
 	auto lightArr = std::make_shared<std::vector<std::unique_ptr<Light::ILight>>>();
-	// lightArr->push_back(std::make_unique<Light::DirectionalLight>(
-	// 	Color(1, 0.5, 1), Vector3f(-1.75, -2, -1.5)));
+	lightArr->push_back(std::make_unique<Light::DirectionalLight>(
+	 	Color(1, 0.5, 1), Vector3f(-1.75, -2, -1.5)));
 	lightArr->push_back(std::make_unique<Light::SpotLight>(
 		Color::white * 4000,
 		Vector3f(0, 80, 10),
 		Vector3f(0, -1, -0.18),
 		45, 90, 0.5
 		));
+	/*
 	lightArr->push_back(std::make_unique<Light::PointLight>(
-		Color(0.5, 0, 0) * 2000, Vector3f(30, 40, 20)));
+		Color(0.5, 0, 0) * 3000, Vector3f(30, 40, 20)));
+		*/
 	/*
 	lightArr->push_back(std::make_unique<Light::PointLight>(
 		Color(0.5, 1, 0.5) * 2000, Vector3f(-30, 40, 20)));
@@ -177,18 +179,22 @@ void RayTracerApp::RenderThread() {
 		90);
 		*/
 
-	auto plane = std::make_unique<Plane>(Vector3f(0, 1, 0), 0);
+	auto plane1 = std::make_unique<Plane>(Vector3f(0, 1, 0), 0);
+	auto plane2 = std::make_unique<Plane>(Vector3f(0, 0, 1), -20);
+	auto plane3 = std::make_unique<Plane>(Vector3f(1, 0, 0), -20);
 	auto sphere1 = std::make_unique<Sphere>(Vector3f(-10, 10, -10), 10);
 	auto sphere2 = std::make_unique<Sphere>(Vector3f(10, 10, -10), 10);
 	PhongMaterial phong1(Color(0.85f, 0.1f, 0.1f), Color::white, 16, 0.25);
 	PhongMaterial phong2(Color(0.1f, 0.25f, 0.75f), Color::white, 16, 0.25);
 	CheckerMaterial check(0.1, 0.5);
-	plane->set_material(&check);
+	plane1->set_material(&check);
 	sphere1->set_material(&phong1);
 	sphere2->set_material(&phong2);
 
 	auto scene = std::make_shared<SceneUnion>();
-	scene->push_back(std::move(plane));
+	scene->push_back(std::move(plane2));
+	scene->push_back(std::move(plane3));
+	scene->push_back(std::move(plane1));
 	scene->push_back(std::move(sphere1));
 	scene->push_back(std::move(sphere2));
 	auto camera = std::make_shared<PerspectiveCamera>(

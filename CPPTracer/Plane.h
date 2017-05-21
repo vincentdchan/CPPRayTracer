@@ -33,9 +33,9 @@ namespace Shape
 			if (a >= 0)
 				return false;
 
-			float b = _normal.dot(ray.get_origin() - _position);
+			float b = _normal.dot(_position - ray.get_origin());
 			result.set_geometry(this);
-			result.set_distance(-b / a);
+			result.set_distance(b / a);
 			result.set_position(ray.get_point(result.get_distance()));
 			result.set_normal(_normal);
 			return true;
