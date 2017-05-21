@@ -288,7 +288,7 @@ HRESULT RayTracerApp::CreateDeviceIndependentResources() {
 	if (SUCCEEDED(hr))
 	{
 		// Center the text horizontally and vertically.
-		m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
 
 		m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
